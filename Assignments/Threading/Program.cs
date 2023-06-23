@@ -2,7 +2,7 @@
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main1(string[] args)
         {
             Thread mainThread = Thread.CurrentThread;
             mainThread.Name = "main thread";
@@ -16,25 +16,48 @@
             //CountDown();
             //CountUp();
         }
-
-        public static void CountDown(string name)
+        static void Main()
         {
-            for (int i = 10; i>=0; i--)
+            Task<int> task1 = new Task<int>(CountDown, "task #1");
+            Task<int> task2 = new Task<int>(CountUp, "task #2");
+
+            task1.Start();
+            task2.Start();
+
+            if (!task1.IsCompleted) 
             {
-                Console.WriteLine($"{name}: "+i+" seconds");
-                Thread.Sleep(1000);
+                task1.Wait();
             }
-            Console.WriteLine($"{name} is complete");
+            if (!task2.IsCompleted)
+            {
+                task2.Wait();
+            }
+            Console.WriteLine(task1.Result);
+            Console.WriteLine(task2.Result);
         }
 
-        public static void CountUp(string name)
+        public static int CountDown(object name)
         {
-            for (int i = 0; i <= 10; i++)
+            int i;
+            for (i = 100; i>0; i--)
             {
-                Console.WriteLine($"{name}: " + i + " seconds");
-                Thread.Sleep(1000);
+                Console.WriteLine($"{name}: "+i+" seconds");
+                //Thread.Sleep(500);
             }
             Console.WriteLine($"{name} is complete");
+            return i;
+        }
+
+        public static int CountUp(object name)
+        {
+            int i;
+            for (i = 0; i < 100; i++)
+            {
+                Console.WriteLine($"{name}: " + i + " seconds");
+                //Thread.Sleep(500);
+            }
+            Console.WriteLine($"{name} is complete");
+            return i;
         }
     }
 }
